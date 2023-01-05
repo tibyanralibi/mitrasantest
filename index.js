@@ -12,8 +12,12 @@ const port=process.env.PORT || 8000;
 
 //create app from express
 const app=express().use(body_parser.json());
-app.listen(port,()=>{
-    console.log("webhook is listening on port " + port);
+var listener = app.listen(port,()=>{
+    console.log("===Listener=================================================");
+    console.log("webhook is listening on port " + listener.address().port);
+    console.log("token found    : " + token);
+    console.log("my token found : " + myToken);
+    console.log("===End Listener=============================================");
 });
 
 //to verify the callback url from dashboard side (cloud api side)
@@ -22,6 +26,12 @@ app.get("/webhook",(req,res)=>{
     let challenge=req.query["hub.challenge"];
     let verify_token=req.query["hub.verify_token"];
 
+    console.log("===Get Webhook=================================================");
+    console.log("Mode : " + mode);
+    console.log("Challenge : " + challenge);
+    console.log("Verify Token : " + verify_token);
+    console.log("===End Get Webhook=============================================");
+
     if(mode && token){
         if(mode=="subscribe" && verify_token==myToken){
             res.status(200).send(challenge);
@@ -29,6 +39,14 @@ app.get("/webhook",(req,res)=>{
             res.status(403);
         }
     }
+});
+
+app.get("/",(req,res)=>{
+    res.status(200).send("Hello this is webhook setup");
+});
+
+app.get("/ping",(req,res)=>{
+    res.send("Pong");
 });
 
 app.post("/webhook",(req,res)=>{
@@ -77,10 +95,3 @@ app.post("/webhook",(req,res)=>{
     }
 });
 
-app.get("/",(req,res)=>{
-    res.status(200).send("Hello this is webhook setup");
-});
-
-app.get("/ping",(req,res)=>{
-    res.send("Pong");
-});
